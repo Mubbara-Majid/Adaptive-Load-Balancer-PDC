@@ -1,5 +1,6 @@
 mpi4py
 torch
-numpy
+torchvision
 matplotlib
-pynvml
+nvidia-ml-py
+numpy

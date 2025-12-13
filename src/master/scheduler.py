@@ -18,8 +18,9 @@ class MasterNode:
         """
         The main loop:
         1. Wait for a request (READY or DONE).
-        2. If work exists, send it.
-        3. If no work exists, send STOP.
+        2. Log GPU Metrics (if provided).
+        3. If work exists, send it.
+        4. If no work exists, send STOP.
         """
         active_workers = self.num_workers
         
@@ -30,11 +31,17 @@ class MasterNode:
         while active_workers > 0:
             status = MPI.Status()
             
+            # 1. Receive message from ANY worker
             message = self.comm.recv(source=MPI.ANY_SOURCE, tag=MPI.ANY_TAG, status=status)
             
             worker_rank = status.Get_source()
             msg_type = message.get('status')
+            metrics = message.get('metrics')
+            # 2. Log Metrics if available (The "Monitoring" feature)
+            if metrics:
+                print(f"[Master] Worker {worker_rank} Report -> GPU Temp: {metrics.get('temp')}C | Util: {metrics.get('gpu_util')}%")
 
+            # 3. Assign Work
             if self.job_queue:
                 batch_id = self.job_queue.pop(0)
                 
@@ -49,7 +56,7 @@ class MasterNode:
                 print(f"[Master] Job Queue empty. Sent STOP -> Worker {worker_rank}")
 
         end_time = time.time()
-        print(f"[Master] Dynamic Scheduling Completed in {end_time - start_time:.2f} seconds.") # <--- ADD THIS
+        print(f"[Master] Dynamic Scheduling Completed in {end_time - start_time:.2f} seconds.")
         print("[Master] All workers finished. Shutting down.")
         
     def run_static_scheduler(self):
@@ -71,6 +78,7 @@ class MasterNode:
         
         # 2. Assign batches upfront
         for worker_rank in range(1, self.num_workers + 1):
+            # Calculate start and end indices for this worker
             count = batches_per_worker + (1 if worker_rank <= remainder else 0)
             assigned_batches = self.job_queue[current_batch_index : current_batch_index + count]
             current_batch_index += count
@@ -79,8 +87,14 @@ class MasterNode:
             
             for batch_id in assigned_batches:
                 status = MPI.Status()
-                self.comm.recv(source=worker_rank, tag=MPI.ANY_TAG, status=status)
+                # Wait for worker to be ready
+                msg = self.comm.recv(source=worker_rank, tag=MPI.ANY_TAG, status=status)
                 
+                # (Optional) Log metrics in static mode too
+                metrics = msg.get('metrics')
+                if metrics:
+                     print(f"[Master] Worker {worker_rank} Report -> GPU Temp: {metrics.get('temp')}C")
+
                 self.comm.send({'batch_id': batch_id}, dest=worker_rank, tag=100)
                 print(f"[Master] Static Logic: Forced Batch {batch_id} -> Worker {worker_rank}")
 

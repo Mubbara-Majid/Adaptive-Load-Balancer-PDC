@@ -5,8 +5,10 @@ import torch.nn.functional as F
 import sys
 import os
 
+# Ensure we can find the src folder
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
 
+from src.worker.monitor import GPUMonitor
 from src.shared.model import SimpleCNN
 from src.shared.data_loader import get_data_loader
 
@@ -16,6 +18,10 @@ class WorkerNode:
         self.rank = rank
         self.device = torch.device("cpu")
         
+        # The Monitor automatically switches to simulation if no GPU is found
+        self.monitor = GPUMonitor(device_index=0) 
+        
+        # Straggler Simulation
         self.is_straggler = (self.rank % 2 != 0) 
         self.artificial_delay = 1.5 if self.is_straggler else 0.0
 
@@ -69,4 +75,12 @@ class WorkerNode:
 
             print(f"[Worker {self.rank}] Finished Batch {batch_id} (Loss: {loss:.4f})")
             
-            self.comm.send({'status': 'DONE'}, dest=0, tag=100)
+            # --- FIXED: Use correct method name 'get_stats' ---
+            metrics = self.monitor.get_stats()
+            
+            self.comm.send({
+                'status': 'DONE', 
+                'metrics': metrics 
+            }, dest=0, tag=100)
+            
+        self.monitor.shutdown()

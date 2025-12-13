@@ -55,7 +55,7 @@ def plot_comparison(static_time, dynamic_time, static_idle, dynamic_idle):
     plt.show()
 
 if __name__ == "__main__":    
-    real_static_time = 41.94
+    real_static_time = 47.24
     real_dynamic_time = 25.87
     
     real_static_idle_avg = 20.0 

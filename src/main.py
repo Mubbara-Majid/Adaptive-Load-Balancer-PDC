@@ -2,6 +2,7 @@ from mpi4py import MPI
 import sys
 import os
 
+# Add 'src' to python path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from src.master.scheduler import MasterNode
@@ -28,7 +29,6 @@ def main():
             
     else:
         # --- WORKER NODE ---
-        # Workers don't need to know the mode; they just obey commands.
         app = WorkerNode(comm, rank)
         app.start()
 
