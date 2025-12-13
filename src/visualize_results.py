@@ -3,7 +3,6 @@ import numpy as np
 import os
 
 def plot_comparison(static_time, dynamic_time, static_idle, dynamic_idle):
-    # --- SETUP DATA ---
     labels = ['Static Scheduling', 'Adaptive (Dynamic) Scheduling']
     total_times = [static_time, dynamic_time]
     idle_times = [static_idle, dynamic_idle]
@@ -15,7 +14,6 @@ def plot_comparison(static_time, dynamic_time, static_idle, dynamic_idle):
     fig, ax = plt.subplots(figsize=(8, 6))
     rects1 = ax.bar(x, total_times, width, label='Total Time', color=['#ff9999', '#66b3ff'])
 
-    # Add text labels, title, and custom x-axis tick labels
     ax.set_ylabel('Time (Seconds)')
     ax.set_title('Total Training Duration: Static vs. Adaptive')
     ax.set_xticks(x)
@@ -57,10 +55,10 @@ def plot_comparison(static_time, dynamic_time, static_idle, dynamic_idle):
     plt.show()
 
 if __name__ == "__main__":    
-    real_static_time = 25.0  
-    real_dynamic_time = 14.0
+    real_static_time = 41.94
+    real_dynamic_time = 25.87
     
-    real_static_idle_avg = 10.0 
-    real_dynamic_idle_avg = 0.5 
+    real_static_idle_avg = 20.0 
+    real_dynamic_idle_avg = 0.1
     
     plot_comparison(real_static_time, real_dynamic_time, real_static_idle_avg, real_dynamic_idle_avg)

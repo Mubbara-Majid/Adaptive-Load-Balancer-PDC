@@ -3,11 +3,6 @@ from torchvision import datasets, transforms
 import os
 
 def get_data_loader(batch_size=64):
-    """
-    Returns a PyTorch DataLoader for the MNIST dataset.
-    Downloads data automatically if not present.
-    """
-    # Create data folder if it doesn't exist
     if not os.path.exists('./data'):
         os.makedirs('./data')
 
