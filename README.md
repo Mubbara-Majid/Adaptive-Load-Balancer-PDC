@@ -27,15 +27,18 @@ pip install -r requirements.txt
 ```
 
 ### 3. Prepare the Dataset
+
 Before running the cluster, download the MNIST dataset safely:
 
 ```bash
 python download_data.py
 ```
 🚀 How to Run
+
 This project uses mpiexec to spawn multiple processes. We recommend running with 3 processes (1 Master + 2 Workers).
 
 Mode A: Dynamic Scheduling (The "Smart" Way)
+
 This runs the adaptive algorithm. Workers request tasks when they are free.
 
 ```bash
@@ -45,6 +48,7 @@ mpiexec -n 3 python -u src/main.py dynamic
 Expected Result: Faster completion time. Fast workers process more batches; slow workers process fewer.
 
 Mode B: Static Scheduling (The "Control" Group)
+
 This runs the naive algorithm. Work is split 50/50 at the start.
 
 ```bash
@@ -53,6 +57,7 @@ mpiexec -n 3 python -u src/main.py static
 Expected Result: Slower completion time. The fast worker finishes early and sits idle while the slow worker struggles.
 
 📊 Visualizing Results
+
 After running both modes, the system prints the total execution time in the terminal. You can generate performance comparison graphs using the included script.
 
 Open src/visualize_results.py.
@@ -64,10 +69,11 @@ Run the script:
 ```bash
 python src/visualize_results.py
 ```
+
 Check the plots/ folder for the generated charts.
 
 📂 Project Structure
-Plaintext
+
 ```bash
 ├── src/
 │   ├── master/
@@ -85,11 +91,7 @@ Plaintext
 ```
 
 👥 Contributors
+
 Mubbara Majid - Architecture, Scheduling Logic, Visualization
 
 Noor - Performance Monitoring Module (NVML Integration), Testing
-
----
-
-### **Step 3: Push Everything to GitHub**
-Now that your project is fully documented and working, do one final push:
